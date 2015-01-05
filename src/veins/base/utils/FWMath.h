@@ -19,6 +19,25 @@
 
 // if we're linking with the INET Framework, FWMath.h is provided by there...
 #ifdef WITH_INET
+
+#include <inet/common/INETMath.h>
+
+namespace FWMath {
+
+using inet::math::mod;
+using inet::math::div;
+using inet::math::modulo;
+using inet::math::close;
+using inet::math::stepfunction;
+using inet::math::sign;
+using inet::math::round;
+using inet::math::floorToZero;
+using inet::math::max;
+using inet::math::dBm2mW;
+using inet::math::mW2dBm;
+
+} // namespace FWMath
+
 #else
 // ...otherwise we provide our own in this file.
 
