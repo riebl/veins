@@ -20,7 +20,8 @@
 
 // if we're linking with the INET Framework, Coord.h is provided by there...
 #ifdef WITH_INET
-#include "base/Coord.h"
+#include "inet/common/geometry/common/Coord.h"
+using inet::Coord;
 #else
 // ...otherwise we provide our own in this file.
 
