@@ -9,6 +9,7 @@
 #include "veins/base/phyLayer/Decider.h"
 #include "veins/base/modules/BaseWorldUtility.h"
 #include "veins/base/connectionManager/BaseConnectionManager.h"
+#include "veins/base/utils/FWMath.h"
 
 using Veins::AirFrame;
 

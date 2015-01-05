@@ -17,6 +17,7 @@
 
 #include "veins/base/phyLayer/Mapping.h"
 #include "veins/base/messages/AirFrame_m.h"
+#include "veins/base/utils/FWMath.h"
 
 using Veins::AirFrame;
 

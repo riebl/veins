@@ -28,6 +28,7 @@
 #include "veins/base/messages/BorderMsg_m.h"
 #include "veins/base/utils/FindModule.h"
 #include "veins/base/modules/BaseWorldUtility.h"
+#include "veins/base/utils/FWMath.h"
 
 Define_Module(BaseMobility);
 

@@ -6,6 +6,7 @@
 #include "veins/base/connectionManager/NicEntryDirect.h"
 #include "veins/base/modules/BaseWorldUtility.h"
 #include "veins/base/utils/FindModule.h"
+#include "veins/base/utils/FWMath.h"
 
 #ifndef ccEV
 #define ccEV (ev.isDisabled()||!coreDebug) ? ev : ev << getName() << ": "
