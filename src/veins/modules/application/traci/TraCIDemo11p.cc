@@ -21,7 +21,6 @@
 #include "veins/modules/application/traci/TraCIDemo11p.h"
 
 using Veins::TraCIMobilityAccess;
-using Veins::AnnotationManagerAccess;
 
 const simsignalwrap_t TraCIDemo11p::parkingStateChangedSignal = simsignalwrap_t(TRACI_SIGNAL_PARKING_CHANGE_NAME);
 
@@ -33,8 +32,6 @@ void TraCIDemo11p::initialize(int stage) {
 		mobility = TraCIMobilityAccess().get(getParentModule());
 		traci = mobility->getCommandInterface();
 		traciVehicle = mobility->getVehicleCommandInterface();
-		annotations = AnnotationManagerAccess().getIfExists();
-		ASSERT(annotations);
 
 		sentMessage = false;
 		lastDroveAt = simTime();
@@ -49,7 +46,6 @@ void TraCIDemo11p::onBeacon(WaveShortMessage* wsm) {
 
 void TraCIDemo11p::onData(WaveShortMessage* wsm) {
 	findHost()->getDisplayString().updateWith("r=16,green");
-	annotations->scheduleErase(1, annotations->drawLine(wsm->getSenderPos(), mobility->getPositionAt(simTime()), "blue"));
 
 	if (mobility->getRoadId()[0] != ':') traciVehicle->changeRoute(wsm->getWsmData(), 9999);
 	if (!sentMessage) sendMessage(wsm->getWsmData());

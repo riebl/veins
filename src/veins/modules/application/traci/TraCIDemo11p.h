@@ -40,7 +40,6 @@ class TraCIDemo11p : public BaseWaveApplLayer {
 		TraCIMobility* mobility;
 		TraCICommandInterface* traci;
 		TraCICommandInterface::Vehicle* traciVehicle;
-		AnnotationManager* annotations;
 		simtime_t lastDroveAt;
 		bool sentMessage;
 		bool isParking;
