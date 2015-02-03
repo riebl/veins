@@ -9,7 +9,6 @@ import sys
 from subprocess import check_call
 from logging import warning, error
 from optparse import OptionParser
-import fnmatch
 
 
 # Option handling
@@ -41,10 +40,7 @@ if options.inet:
 
     inet_header_dirs = set()
     inet_src_path = os.path.join(options.inet, 'src')
-    for root, dirnames, filenames in os.walk(inet_src_path):
-        for filename in fnmatch.filter(filenames, '*.h'):
-            inet_header_dirs.add(os.path.relpath(os.path.dirname(os.path.join(root, filename)), 'src'))
-    inet_includes = ['-I' + s for s in inet_header_dirs]
+    inet_includes = ['-I', os.path.join(os.path.relpath(options.inet, 'src'), 'src')]
     inet_link = ["-L" + os.path.join(os.path.relpath(options.inet, 'src'), 'src'), "-linet"]
     inet_defs = ["-DINET_IMPORT", "-DWITH_INET"]
 
