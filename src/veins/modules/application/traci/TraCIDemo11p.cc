@@ -96,5 +96,5 @@ void TraCIDemo11p::handlePositionUpdate(cObject* obj) {
 }
 void TraCIDemo11p::sendWSM(WaveShortMessage* wsm) {
 	if (isParking && !sendWhileParking) return;
-	sendDelayedDown(wsm,individualOffset);
+	BaseWaveApplLayer::sendWSM(wsm);
 }

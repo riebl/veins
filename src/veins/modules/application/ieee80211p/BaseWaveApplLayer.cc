@@ -19,6 +19,7 @@
 //
 
 #include "veins/modules/application/ieee80211p/BaseWaveApplLayer.h"
+#include <inet/linklayer/common/Ieee802Ctrl.h>
 
 const simsignalwrap_t BaseWaveApplLayer::mobilityStateChangedSignal = simsignalwrap_t(MIXIM_SIGNAL_MOBILITY_CHANGE_NAME);
 
@@ -26,10 +27,6 @@ void BaseWaveApplLayer::initialize(int stage) {
 	BaseApplLayer::initialize(stage);
 
 	if (stage==0) {
-		myMac = FindModule<WaveAppToMac1609_4Interface*>::findSubModule(
-		            getParentModule());
-		assert(myMac);
-
 		myId = getParentModule()->getIndex();
 
 		headerLength = par("headerLength").longValue();
@@ -132,6 +129,10 @@ void BaseWaveApplLayer::handleSelfMsg(cMessage* msg) {
 }
 
 void BaseWaveApplLayer::sendWSM(WaveShortMessage* wsm) {
+	inet::Ieee802Ctrl* ctrl = new inet::Ieee802Ctrl();
+	ctrl->setDestinationAddress(inet::MACAddress::BROADCAST_ADDRESS);
+	ctrl->setEtherType(0x88dc);
+	wsm->setControlInfo(ctrl);
 	sendDelayedDown(wsm,individualOffset);
 }
 
