@@ -28,7 +28,7 @@
 #include <list>
 #include <stdexcept>
 
-#include "veins/base/modules/BaseMobility.h"
+#include <inet/mobility/base/MobilityBase.h>
 #include "veins/base/utils/FindModule.h"
 #include "veins/modules/mobility/traci/TraCIScenarioManager.h"
 #include "veins/modules/mobility/traci/TraCICommandInterface.h"
@@ -50,7 +50,7 @@
  * @ingroup mobility
  */
 namespace Veins {
-class TraCIMobility : public BaseMobility
+class TraCIMobility : public inet::MobilityBase
 {
 	public:
 		class Statistics {
@@ -69,14 +69,16 @@ class TraCIMobility : public BaseMobility
 				void recordScalars(cSimpleModule& module);
 		};
 
-		TraCIMobility() : BaseMobility(), isPreInitialized(false), manager(0), commandInterface(0), vehicleCommandInterface(0) {}
+		TraCIMobility() : isPreInitialized(false), manager(0), commandInterface(0), vehicleCommandInterface(0) {}
 		~TraCIMobility() {
 			delete vehicleCommandInterface;
 		}
 		virtual void initialize(int);
+		virtual void initializePosition() override;
+		virtual void initializeOrientation() override;
 		virtual void finish();
 
-		virtual void handleSelfMsg(cMessage *msg);
+		virtual void handleSelfMessage(cMessage *msg);
 		virtual void preInitialize(std::string external_id, const Coord& position, std::string road_id = "", double speed = -1, double angle = -1);
 		virtual void nextPosition(const Coord& position, std::string road_id = "", double speed = -1, double angle = -1, TraCIScenarioManager::VehicleSignal signals = TraCIScenarioManager::VEH_SIGNAL_UNDEF);
 		virtual void changePosition();
@@ -92,9 +94,6 @@ class TraCIMobility : public BaseMobility
 		virtual double getAntennaPositionOffset() const {
 			return antennaPositionOffset;
 		}
-		virtual Coord getPositionAt(const simtime_t& t) const {
-			return move.getPositionAt(t) ;
-		}
 		virtual bool getParkingState() const {
 			return isParking;
 		}
@@ -105,6 +104,13 @@ class TraCIMobility : public BaseMobility
 		virtual double getSpeed() const {
 			if (speed == -1) throw cRuntimeError("TraCIMobility::getSpeed called with no speed set yet");
 			return speed;
+		}
+		virtual Coord getCurrentSpeed() override {
+			Coord v = Coord(cos(getAngleRad()), -sin(getAngleRad()));
+			return v * getSpeed();
+		}
+		virtual Coord getCurrentPosition() override {
+			return lastPosition;
 		}
 		virtual TraCIScenarioManager::VehicleSignal getSignals() const {
 			if (signals == -1) throw cRuntimeError("TraCIMobility::getSignals called with no signals set yet");

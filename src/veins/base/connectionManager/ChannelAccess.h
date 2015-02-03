@@ -32,7 +32,8 @@
 
 #include "veins/base/utils/FindModule.h"
 #include "veins/base/modules/BaseMobility.h"
-typedef AccessModuleWrap<BaseMobility>                ChannelMobilityAccessType;
+#include <inet/mobility/base/MobilityBase.h>
+typedef AccessModuleWrap<inet::MobilityBase>                ChannelMobilityAccessType;
 typedef ChannelMobilityAccessType::wrapType* ChannelMobilityPtrType;
 
 class NicEntry;

@@ -68,10 +68,10 @@ void TraCIMobility::Statistics::recordScalars(cSimpleModule& module)
 
 void TraCIMobility::initialize(int stage)
 {
+	MobilityBase::initialize(stage);
+
 	if (stage == 0)
 	{
-		BaseMobility::initialize(stage);
-
 		debug = par("debug");
 		antennaPositionOffset = par("antennaPositionOffset");
 		accidentCount = par("accidentCount");
@@ -84,16 +84,6 @@ void TraCIMobility::initialize(int stage)
 
 		statistics.initialize();
 		statistics.watch(*this);
-
-		ASSERT(isPreInitialized);
-		isPreInitialized = false;
-
-		Coord nextPos = calculateAntennaPosition(roadPosition);
-		nextPos.z = move.getCurrentPosition().z;
-
-		move.setStart(nextPos);
-		move.setDirectionByVector(Coord(cos(angle), -sin(angle)));
-		move.setSpeed(speed);
 
 		WATCH(road_id);
 		WATCH(speed);
@@ -113,15 +103,16 @@ void TraCIMobility::initialize(int stage)
 			scheduleAt(simTime() + accidentStart, startAccidentMsg);
 		}
 	}
-	else if (stage == 1)
-	{
-		// don't call BaseMobility::initialize(stage) -- our parent will take care to call changePosition later
-	}
-	else
-	{
-		BaseMobility::initialize(stage);
-	}
+}
 
+void TraCIMobility::initializePosition()
+{
+	ASSERT(isPreInitialized);
+}
+
+void TraCIMobility::initializeOrientation()
+{
+	ASSERT(isPreInitialized);
 }
 
 void TraCIMobility::finish()
@@ -136,7 +127,7 @@ void TraCIMobility::finish()
 	isPreInitialized = false;
 }
 
-void TraCIMobility::handleSelfMsg(cMessage *msg)
+void TraCIMobility::handleSelfMessage(cMessage *msg)
 {
 	if (msg == startAccidentMsg) {
 		getVehicleCommandInterface()->setSpeed(0);
@@ -164,11 +155,10 @@ void TraCIMobility::preInitialize(std::string external_id, const Coord& position
 	this->antennaPositionOffset = par("antennaPositionOffset");
 
 	Coord nextPos = calculateAntennaPosition(roadPosition);
-	nextPos.z = move.getCurrentPosition().z;
+	nextPos.z = getCurrentPosition().z;
 
-	move.setStart(nextPos);
-	move.setDirectionByVector(Coord(cos(angle), -sin(angle)));
-	move.setSpeed(speed);
+	lastPosition = nextPos;
+	lastOrientation = inet::EulerAngles(angle, 0.0, 0.0);
 
 	isPreInitialized = true;
 }
@@ -192,17 +182,17 @@ void TraCIMobility::changePosition()
 	ASSERT(lastUpdate != simTime());
 
 	// keep statistics (for current step)
-	currentPosXVec.record(move.getStartPos().x);
-	currentPosYVec.record(move.getStartPos().y);
+	currentPosXVec.record(lastPosition.x);
+	currentPosYVec.record(lastPosition.y);
 
 	Coord nextPos = calculateAntennaPosition(roadPosition);
-	nextPos.z = move.getCurrentPosition().z;
+	nextPos.z = lastPosition.z;
 
 	// keep statistics (relative to last step)
 	if (statistics.startTime != simTime()) {
 		simtime_t updateInterval = simTime() - this->lastUpdate;
 
-		double distance = move.getStartPos().distance(nextPos);
+		double distance = lastPosition.distance(nextPos);
 		statistics.totalDistance += distance;
 		statistics.totalTime += updateInterval;
 		if (speed != -1) {
@@ -224,12 +214,14 @@ void TraCIMobility::changePosition()
 	}
 	this->lastUpdate = simTime();
 
-	move.setStart(Coord(nextPos.x, nextPos.y, move.getCurrentPosition().z)); // keep z position
-	move.setDirectionByVector(Coord(cos(angle), -sin(angle)));
-	move.setSpeed(speed);
+	nextPos.z = lastPosition.z;
+	lastPosition = nextPos;
+	lastOrientation = inet::EulerAngles(angle, 0.0, 0.0);
+
 	if (ev.isGUI()) updateDisplayString();
 	fixIfHostGetsOutside();
-	updatePosition();
+	emitMobilityStateChangedSignal();
+	updateVisualRepresentation();
 }
 
 void TraCIMobility::changeParkingState(bool newState) {
@@ -295,18 +287,9 @@ void TraCIMobility::updateDisplayString() {
 
 void TraCIMobility::fixIfHostGetsOutside()
 {
-	Coord pos = move.getStartPos();
-	Coord dummy = Coord::ZERO;
-	double dum;
-
-	bool outsideX = (pos.x < 0) || (pos.x >= playgroundSizeX());
-	bool outsideY = (pos.y < 0) || (pos.y >= playgroundSizeY());
-	bool outsideZ = (!world->use2D()) && ((pos.z < 0) || (pos.z >= playgroundSizeZ()));
-	if (outsideX || outsideY || outsideZ) {
-		error("Tried moving host to (%f, %f) which is outside the playground", pos.x, pos.y);
+	if (isOutside()) {
+		error("Tried moving host to (%f, %f) which is outside the playground", lastPosition.x, lastPosition.y);
 	}
-
-	handleIfOutside( RAISEERROR, pos, dummy, dummy, dum);
 }
 
 double TraCIMobility::calculateCO2emission(double v, double a) const {

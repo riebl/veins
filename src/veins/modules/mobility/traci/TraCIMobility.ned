@@ -20,7 +20,7 @@
 
 package org.car2x.veins.modules.mobility.traci;
 
-import org.car2x.veins.base.modules.BaseMobility;
+import inet.mobility.base.MobilityBase;
 
 //
 // Used in modules created by the TraCIScenarioManager.
@@ -35,7 +35,7 @@ import org.car2x.veins.base.modules.BaseMobility;
 // @see TraCIScenarioManager
 // @see TraCIScenarioManagerLaunchd
 //
-simple TraCIMobility extends BaseMobility
+simple TraCIMobility extends MobilityBase
 {
     parameters:
         @class(Veins::TraCIMobility);
