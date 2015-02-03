@@ -20,8 +20,9 @@
 
 #include "veins/modules/application/ieee80211p/BaseWaveApplLayer.h"
 #include <inet/linklayer/common/Ieee802Ctrl.h>
+#include <inet/mobility/contract/IMobility.h>
 
-const simsignalwrap_t BaseWaveApplLayer::mobilityStateChangedSignal = simsignalwrap_t(MIXIM_SIGNAL_MOBILITY_CHANGE_NAME);
+const simsignal_t BaseWaveApplLayer::mobilityStateChangedSignal = inet::IMobility::mobilityStateChangedSignal;
 
 void BaseWaveApplLayer::initialize(int stage) {
 	BaseApplLayer::initialize(stage);

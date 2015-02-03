@@ -62,7 +62,7 @@ class BaseWaveApplLayer : public BaseApplLayer {
 
 	protected:
 
-		static const simsignalwrap_t mobilityStateChangedSignal;
+		static const simsignal_t mobilityStateChangedSignal;
 
 		/** @brief handle messages from below */
 		virtual void handleLowerMsg(cMessage* msg);
