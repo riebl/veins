@@ -44,9 +44,7 @@ TraCIScenarioManager::TraCIScenarioManager() :
 		mobRng(0),
 		connection(0),
 		connectAndStartTrigger(0),
-		executeOneTimestepTrigger(0),
-		world(0),
-		cc(0)
+		executeOneTimestepTrigger(0)
 {
 }
 
@@ -119,12 +117,6 @@ void TraCIScenarioManager::initialize(int stage) {
 	drivingVehicleCount = 0;
 	autoShutdownTriggered = false;
 
-	world = FindModule<BaseWorldUtility*>::findGlobalModule();
-	if (world == NULL) error("Could not find BaseWorldUtility module");
-
-	cc = FindModule<BaseConnectionManager*>::findGlobalModule();
-	if (cc == NULL) error("Could not find BaseConnectionManager module");
-
 	ASSERT(firstStepAt > connectAt);
 	connectAndStartTrigger = new cMessage("connect");
 	scheduleAt(connectAt, connectAndStartTrigger);
@@ -167,7 +159,6 @@ void TraCIScenarioManager::init_traci() {
 		TraCICoord netbounds2 = TraCICoord(x2, y2);
 		MYDEBUG << "TraCI reports network boundaries (" << x1 << ", " << y1 << ")-(" << x2 << ", " << y2 << ")" << endl;
 		connection->setNetbounds(netbounds1, netbounds2, par("margin"));
-		if ((connection->traci2omnet(netbounds2).x > world->getPgs()->x) || (connection->traci2omnet(netbounds1).y > world->getPgs()->y)) MYDEBUG << "WARNING: Playground size (" << world->getPgs()->x << ", " << world->getPgs()->y << ") might be too small for vehicle at network bounds (" << connection->traci2omnet(netbounds2).x << ", " << connection->traci2omnet(netbounds1).y << ")" << endl;
 	}
 
 	{
@@ -348,8 +339,6 @@ bool TraCIScenarioManager::isModuleUnequipped(std::string nodeId) {
 void TraCIScenarioManager::deleteManagedModule(std::string nodeId) {
 	cModule* mod = getManagedModule(nodeId);
 	if (!mod) error("no vehicle with Id \"%s\" found", nodeId.c_str());
-
-	cc->unregisterNic(mod->getSubmodule("nic"));
 
 	hosts.erase(nodeId);
 	mod->callFinish();
