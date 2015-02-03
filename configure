@@ -41,7 +41,7 @@ if options.inet:
     inet_header_dirs = set()
     inet_src_path = os.path.join(options.inet, 'src')
     inet_includes = ['-I', os.path.join(os.path.relpath(options.inet, 'src'), 'src')]
-    inet_link = ["-L" + os.path.join(os.path.relpath(options.inet, 'src'), 'src'), "-linet"]
+    inet_link = ["-L" + os.path.join(os.path.relpath(options.inet, 'src'), 'src'), "-lINET"]
     inet_defs = ["-DINET_IMPORT", "-DWITH_INET"]
 
     makemake_flags += inet_includes + inet_link + inet_defs
