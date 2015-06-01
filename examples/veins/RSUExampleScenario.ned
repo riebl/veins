@@ -13,13 +13,17 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
+
 import org.car2x.veins.nodes.RSU;
 import org.car2x.veins.nodes.Scenario;
+import org.car2x.veins.modules.mobility.traci.TraCIOSMLaunchd;
 
 network RSUExampleScenario extends Scenario
 {
+ 
     submodules:
         rsu[1]: RSU {
             @display("p=150,140;b=10,10,oval");
         }
+       
 }
