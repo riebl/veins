@@ -48,50 +48,22 @@ void TraCIOSMLaunchd::finish() {
 
 void TraCIOSMLaunchd::handleSelfMsg(cMessage* msg)
 {
-    mySocket.bind(3000);
     TraCIScenarioManagerLaunchd::handleSelfMsg(msg);
     if (msg == executeOneTimestepTrigger)
     {
-        if (simTime() > 1)
+        typedef std::map<std::string, cModule*> host_map;
+        for (host_map::const_iterator it = hosts.begin(); it != hosts.end(); ++it)
         {
-            for (std::set<std::string>::const_iterator it =subscribedVehicles.begin(); it != subscribedVehicles.end(); ++it)
-            {
-                for(int i = 0; i<myModCar.size();i++)
-                {
-                  //  myModCar.insert(getManagedHosts()); // putting hosts in a set
-                     myModCar.insert(getManagedModule(subscribedVehicles)); //another way to insert into the set.Would work in the same way though.
-                }
-
-                   for(int it =myModCar.begin(); it!=myModCar.end();it++)
-                   {
-                       myPacket = new packetDatagram();
-                       //Trying to get the data and put it in a buffer as OurMsg
-                       myCarMobilityAccess = TraCIMobilityAccess().get(myModCar);
-                       myCarCoord = myCarMobilityAccess->getCurrentPosition();
-                       //myPacket.myCarSpeed = myCarMobilityAccess->getSpeed();
-                       myPacket->myCarAngle = myCarMobilityAccess->getAngleRad();
-                       myPacket->myCarID = myCarMobilityAccess->getExternalId();
-                       myPacket->myCarPosX = myCarCoord->x;
-                       myPacket->myCarPosY = myCarCoord->y;
-
-
-
-                       // maybe this way we can extract the data !!!
-
-                       // then create the json file as our buffer and send the data through our socket
-                       ourMsg = new cPacket(*i);
-                       mySocket.send(ourMsg);
-                       mySocket.close();
-                   }
-             }
-
+            const TraCIMobility* mobility = TraCIMobilityAccess().get(it->second);
+            Coord car = mobility->getCurrentPosition();
+            packetDatagram packet;
+            packet.myCarID = mobility->getExternalId();
+            packet.myCarAngle = mobility->getAngleRad();
+            packet.myCarPosX = car.x;
+            packet.myCarPosY = car.y;
+            // if you had a proper UDP socket, then you could send a packet...
          }
-     }
- }
-
-        return;
-
-    error("TraCIScenarioManager received unknown self-message");
+    }
 }
 
 Veins::TraCIOSMLaunchd::TraCIOSMLaunchd() {

@@ -21,10 +21,11 @@
 #ifndef WORLD_TRACI_TRACIOSMLAUNCHD_H
 #define WORLD_TRACI_TRACIOSMLAUNCHD_H
 
-#include <omnetppp.h>
+#include <omnetpp.h>
 #include <UDPSocket.h>
 #include <cmessage.h>
 
+#include "modules/mobility/traci/TraCIMobility.h"
 #include "modules/mobility/traci/TraCIScenarioManager.h"
 #include "modules/mobility/traci/TraCIScenarioManagerLaunchd.h"
 
@@ -52,6 +53,7 @@ class TraCIOSMLaunchd: public TraCIScenarioManagerLaunchd
 		virtual ~TraCIOSMLaunchd();
 	    virtual void handleSelfMsg(cMessage *msg);
 	    virtual void initialize(int stage);
+	    virtual void finish();
 	    char* osmBuf;
 	    std::set<cModule*> myModCar;
 	    Coord* myCarCoord;
@@ -65,7 +67,7 @@ class TraCIOSMLaunchd: public TraCIScenarioManagerLaunchd
 	    {
 	        double myCarPosX,myCarPosY,myCarAngle;
 
-	        string myCarID;
+	        std::string myCarID;
 
 	    };
 	    packetDatagram* myPacket;
